@@ -24,7 +24,7 @@ jobs:
         
     - name: Créer le projet Beeware / Application iOS
       run: |
-        briefcase new --template ios --no-input
+        briefcase new --no-input
         mkdir -p "Rando Camara/src/randocamara"
         cp main.py "Rando Camara/src/randocamara/app.py"
 
