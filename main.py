@@ -27,7 +27,11 @@ class PhotoRandomizerApp:
         self.root.config(bg="#0b0b0f") # Fond sombre style OLED
 
         self.input_dir = ""
-        self.output_dir = ""
+        
+        # Dossier de sortie configuré automatiquement dans l'app "Fichiers" d'iOS (~/Documents/photos_traitees)
+        docs_path = os.path.expanduser("~/Documents")
+        self.output_dir = os.path.join(docs_path, "photos_traitees")
+        os.makedirs(self.output_dir, exist_ok=True)
 
         self.create_widgets()
 
@@ -43,10 +47,10 @@ class PhotoRandomizerApp:
         subtitle_label.pack(pady=2)
 
         # Section Sélection Dossier Source
-        self.create_card("DOSSIER SOURCE (PHOTOS ORIGINALES)", self.select_input, "Sélectionner...", "input_lbl")
+        self.create_card("DOSSIER SOURCE (PHOTOS ORIGINALES)", self.select_input, "Sélectionner...", "input_lbl", show_btn=True)
 
-        # Section Sélection Dossier Sortie
-        self.create_card("DOSSIER DE SORTIE (TRAITÉ)", self.select_output, "Sélectionner...", "output_lbl")
+        # Section Dossier de Sortie (Automatique dans l'app Fichiers)
+        self.create_card("DOSSIER DE SORTIE (APPLI FICHIERS)", None, "Documents/photos_traitees", "output_lbl", show_btn=False)
 
         # Barre de progression
         progress_frame = tk.Frame(self.root, bg="#161622", bd=0)
@@ -64,7 +68,7 @@ class PhotoRandomizerApp:
         self.btn_start = tk.Button(self.root, text="✨ Lancer le Randomizer", font=("Helvetica", 12, "bold"), fg="white", bg="#ff2d55", activebackground="#e0244c", bd=0, relief="flat", command=self.start_process_thread)
         self.btn_start.pack(padx=20, pady=20, fill="x", ipady=12)
 
-    def create_card(self, title, command, default_text, attr_name):
+    def create_card(self, title, command, default_text, attr_name, show_btn=True):
         card = tk.Frame(self.root, bg="#161622", bd=0)
         card.pack(padx=20, pady=8, fill="x")
 
@@ -77,8 +81,9 @@ class PhotoRandomizerApp:
         lbl.pack(side="left", padx=10, pady=10, fill="x", expand=True)
         setattr(self, attr_name, lbl)
 
-        btn = tk.Button(inner_frame, text="📁", font=("Helvetica", 10), fg="white", bg="#2c2c3e", bd=0, command=command)
-        btn.pack(side="right", padx=5, pady=5)
+        if show_btn:
+            btn = tk.Button(inner_frame, text="📁", font=("Helvetica", 10), fg="white", bg="#2c2c3e", bd=0, command=command)
+            btn.pack(side="right", padx=5, pady=5)
 
     def select_input(self):
         dir_path = filedialog.askdirectory()
@@ -86,15 +91,9 @@ class PhotoRandomizerApp:
             self.input_dir = dir_path
             self.input_lbl.config(text=os.path.basename(dir_path) or dir_path)
 
-    def select_output(self):
-        dir_path = filedialog.askdirectory()
-        if dir_path:
-            self.output_dir = dir_path
-            self.output_lbl.config(text=os.path.basename(dir_path) or dir_path)
-
     def start_process_thread(self):
-        if not self.input_dir or not self.output_dir:
-            messagebox.showerror("Erreur", "Veuillez sélectionner les dossiers source et de sortie !")
+        if not self.input_dir:
+            messagebox.showerror("Erreur", "Veuillez sélectionner le dossier source des photos originales !")
             return
         
         self.btn_start.config(state="disabled")
@@ -143,7 +142,7 @@ class PhotoRandomizerApp:
 
             self.save_history(used_numbers_set)
             self.status_label.config(text="✓ Traitement terminé avec succès !")
-            messagebox.สำเร็จ("Succès", "Toutes les photos ont été randomisées et générées !")
+            messagebox.showinfo("Succès", "Toutes les photos ont été randomisées dans l'app Fichiers !")
         except Exception as ex:
             self.status_label.config(text=f"Erreur critique : {ex}")
         finally:
