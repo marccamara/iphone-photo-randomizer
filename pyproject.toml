@@ -1,0 +1,10 @@
+[tool.briefcase]
+project_name = "Rando Camara"
+bundle = "com.camara"
+formal_name = "Rando Camara"
+app_name = "randocamara"
+
+[tool.briefcase.app.randocamara]
+formal_name = "Rando Camara"
+bundle = "com.camara"
+sources = ["src/randocamara"]
